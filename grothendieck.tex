@@ -1,0 +1,478 @@
+\documentclass[a4paper]{article}
+
+% Linguistic and standard settings
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage{/home/carlo/Modelli/modello}
+
+%%% Page Styles %%%
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\bfseries \thepage}
+\fancyhead[C]{\bfseries Grothendieck topologies}
+\fancyhead[R]{\bfseries Category Theory}
+
+\setlength{\headheight}{13.6pt}
+
+%%% Bibliography stuff %%%
+\usepackage[autostyle]{csquotes}
+\usepackage[style=alphabetic, backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
+% Author and title
+\author{Carlo Buccisano}
+\title{Introduction to Grothendieck topologies}
+
+\begin{document}
+    \maketitle
+    \begin{abstract}
+        We will first give a brief introduction on Grothendieck pretopologies, topologies and how they're related. We will then generalize the concept of sheaves, normally used on topological spaces, to a category endowed with a (pre)topology and we'll state an analogous result about the sheafification functor. Finally we'll introduce the concept of canonical topology and we will state a few examples, focusing on the category of open subsets of a topological space.
+    \end{abstract}
+    \section{Main definitions}
+        \subsection{Pretopologies}
+            The idea behind Grothendieck (pre)topologies is to extend the (pre)topology notion to general categories, to generalize sheaves, for example. The open coverings of an object will be some particular maps to such object, and intersection becomes fibered product (indeed in $\Set$ for $A, B \subset C$ then $A \cap B = A \times_C B$).
+            Let's give now the definitions.
+            \begin{defn}
+                Let $\Cat$ be a category. A \emph{Grothendieck pretopology} $\Pcal$ on $\Cat$ is given by the datum, for each $U \in \Cat$, of a collection of morphisms $\Ucal = \{U_i \to U\}_{i \in I}$ ($I$ is an index set, which can vary depending on $U$), called \emph{coverings of $U$} and satisfying the following axioms.
+                \begin{enumerate}
+                    \item[$\mathbf{PG1}$] If $V \to U$ is an isomorphism, then $\{V \to U\}$ is a covering.
+                    \item[$\mathbf{PG2}$] If $\Ucal = \{U_i \to U\}$ is a $U$-covering, and $V \to U$ is a morphism in $\Cat$, then the fibered products $\{U_i \times_U V\}$ exist in $\Cat $ and the family of maps $\Ucal \times_U V \coloneqq \{U_i \times_U V \to V\}$ is a $V$-covering.
+                    \item[$\mathbf{PG3}$] If $\Ucal = \{U_i \to U\}$ is a covering and, for each $i$, $\Vcal_i = \{V_{i,j} \to U_i\}$ is an $U_i$-covering, then $\Ucal \circ \Vcal \coloneqq \{V_{i,j} \to U_i \to U\}$ is a covering for $U$.
+                \end{enumerate}
+            \end{defn}
+
+            Let's observe that the axioms imply that if $\Ucal$ and $\Vcal$ are $U$-coverings then $\Ucal \times_U \Vcal = \{U_i \times_U V_j \to U\}$ is an $U$-covering. A category $\Cat$ endowed with a Grothendieck pretopology $\Pcal$ is called a \emph{site}.
+            Let's now introduce a definition of equivalence between Grothendieck pretopologies.
+            \begin{defn}
+                Let $\Cat$ be a category and $\Ucal = \{U_i \to U\}$ a set of arrows. Define a refinement of $\Ucal$ to be a set of arrows $\Vcal = \{V_j \to U\}$ such that for each $j$ there exists an $i$ such that the map $V_j \to U$ factorizes through $U_i \to U$.
+            \end{defn}
+            We verify easily that the relation ``to be a refinement of'' on $U$-coverings of $\Cat$ is a pre-order: it is reflexive ($\Ucal$ is trivially a refinement of itself) and it is clearly transitive.
+
+            \begin{defn}
+                \label{defn:equivalent_pretopologies}
+                Given a category $\Cat$ and two Grothendieck pretopologies $\Pcal_1, \Pcal_2$ on it, we write $\Pcal_1 \preceq \Pcal_2$ (and we say $\Pcal_1$ is subordinate to $\Pcal_2$) if any covering in $\Pcal_1$ has a refinement which is also a covering in $\Pcal_2$.
+                If $\Pcal_1 \preceq \Pcal_2$ and $\Pcal_2 \preceq \Pcal_1$ then we say that they are equivalent and we write $\Pcal_1 \equiv \Pcal_2$.
+            \end{defn}
+
+            This equivalence defines a reflexive and transitive relation between pretopologies, because ``to be a refinement of'' has such properties. It is also a symmetric relation so that it is really an equivalence relation.
+
+            \begin{defn}
+                A pretopology $\Pcal$ on $\Cat$ is \emph{saturated} if any set of arrows $\Ucal = \{U_i \to U\}$ having a refinement in $\Pcal$ is itself in $\Pcal$. We write $\overline{\Pcal}$ the collection of the set of arrows having a refinement in $\Pcal$ and we call $\overline{\Pcal}$ the saturation on $\Pcal$.
+            \end{defn}
+            Here we list some basic properties.
+            \begin{prop}
+                Let $\Pcal$ be a pretopology on $\Cat$. The following hold:
+                \begin{enumerate}
+                    \item the saturation $\overline{\Pcal}$ is a saturated pretopology;
+                    \item $\Pcal \subseteq \overline{\Pcal}$;
+                    \item $\Pcal \equiv \overline{\Pcal}$;
+                    \item $\Pcal$ is saturated if and only if $\Pcal = \overline{\Pcal}$;
+                    \item given a pretopology $\Pcal'$ on $\Cat$ then $\Pcal' \preceq \Pcal$ iff $\overline{\Pcal'} \preceq \overline{\Pcal}$ (same with $\equiv$);
+                    \item a pretopology on $\Cat$ is equivalent to only one saturated pretopology.
+                \end{enumerate}
+            \end{prop}
+            The proof should not be too difficult. 
+
+        \subsection{Sieves and topologies}
+            To introduce the notion of a Grothendieck topology (clearly related to the definition of pretopology, we'll see how later) we first need to define some other objects.
+            \begin{defn}
+                Given an object $U \in \Cat$ we define a \emph{sieve} $S$ on $U$ to be a subfunctor of $h_U = \Hom_{\Cat}(\bullet, U)\colon \Cop \to \Set$.
+            \end{defn}
+            More concretely we can think that to each $W \in \Cat$, $S(W)$ is a collection of arrows $W \to U$ and such that for each $f\colon V \to W$ we have $V \to W \to U \in S(V)$ (by functoriality).
+
+            Given a $U$-cover $\Ucal$ in $\Cat$ we can define the sieve $h_{\Ucal} \subseteq h_U$ setting $h_{\Ucal}(W)$ to be the set of arrows $W \to U$ factorizing through $W \to U_i \to U$ for some $U_i \to U$ in $\Ucal$. Here we can understand why the name sieve was chosen: we just select the particular arrows ``passing through'' some holes ($\Ucal$).
+
+            Observe also that given $\Vcal \subseteq \Ucal$ two $U$-coverings, then $h_{\Vcal} \subseteq h_{\Ucal} \subseteq h_U$. We know that, given two $U$-coverings $\Ucal, \Vcal$, their fibered product $\Ucal \times_U \Vcal = \{U_i \times_U V_j \to U\}$ is again a covering; by the universal property any arrow $W \to U$ factorizing through $U_i \times_U V_j \to U$ also factorizes through $U_i \to U$ and $V_j \to U$, so that $h_{\Ucal \times_U \Vcal} = h_{\Ucal} \cap h_{\Vcal} \subset h_U$.
+            
+            \begin{prop}
+                Given two $U$-coverings $\Ucal$ and $\Vcal$, $\Vcal$ is a refinement of $\Ucal$ iff $h_{\Vcal} \subseteq h_{\Ucal}$.
+            \end{prop}
+
+            We are now ready to define Grothendieck topologies.
+            \begin{defn}
+                Let $\Cat$ be a category. A \emph{Grothendieck topology} $\Tcal$ on $\Cat$ is the datum of a collection $\{\Scov_U \}_{U \in \textrm{Ob}(\Cat)}$, where for each $U \in \Cat$ $\Scov_U$ is a family of sieves on $U$, called covering sieves on $U$, satisfying the following axioms.
+                \begin{enumerate}
+                    \item[$\mathbf{GT1}$] $h_U \in \Scov_U$.
+                    \item[$\mathbf{GT2}$] If $S_1 \subseteq S_2$ are two sieves on $U$ and $S_1 \in \Scov_U$ then $S_2 \in \Scov_U$.
+                    \item[$\mathbf{GT3}$] Given $f\colon V \to U$ in $\Cat$ and $S \in \Scov_U$, then $S \times_U V \coloneqq S \times_{h_U} h_V$ (it is the fibered product in $\Cat\,\hat{} \coloneqq \funct(\Cop, \Set)$, we will implicitely use the Yoneda identification $U \mapsto h_U$) is a covering sieve of $V$. We observe that $(S \times_U V)(W) = \{\alpha\colon W \to V \mid f \circ \alpha \in S(W)\}$ by means of 
+                    \begin{diag}
+                        S \times_U V \arrow[r] \arrow[d, hookrightarrow] & S \arrow[d, hookrightarrow] \\
+                        V \cong h_V \arrow[r, "f \circ"] & U \cong h_U
+                    \end{diag} 
+
+                    \item[$\mathbf{GT4}$] If $S_1, S_2$ are sieves on $U$, $S_2 \in \Scov_U$ and for any $V \to U \in S_2(V)$ $S_1 \times_U V \in \Scov_V$, then $S_1$ is also a covering sieve on $U$.
+                \end{enumerate}
+            \end{defn}
+
+            These axioms are redundant, in particular the axiom $\mathbf{GT2}$ descends from $\mathbf{GT3}$ and $\mathbf{GT4}$. 
+            \begin{lemma}
+                \label{lemma:fibered_product_inner_sieve}
+                Let $\Cat$ be a category endowed with a Grothendieck topology $\Tcal$. Given $S \in \Scov_U$ and $f\colon V \to U \in S(V)$, then $S \times_U V = h_V$.
+            \end{lemma}
+            \begin{proof}
+                By $\mathbf{GT3}$ we already know that $S \times_U V \subseteq h_V$ is a sieve on $V$ so we just need to prove $\id_V \in S \times_U V$ (and then we conclude using the ``absorbing'' property of sieves mentioned above because each $g\colon W \to V$ is equal to $\id_V \circ g$). We have $(S \times_U V)(V) = \{\alpha\colon V \to V \mid f \circ \alpha = \phi \in S(V)\}$, i.e.\ the following diagram is commutative
+                \begin{diag}
+                    V \arrow[rd, "\phi"] \arrow[d, "\alpha"] & \\
+                    V \arrow[r, "f"] & U
+                \end{diag}
+                We see that, from this, it is clear that $id_V \in (S \times_U V)(V)$, and thus $S \times_U V = h_V$.
+            \end{proof}
+
+            \begin{prop}
+                \label{prop:no_gt2}
+                The axiom $\mathbf{GT2}$ descends from $\mathbf{GT3}$ and $\mathbf{GT4}$.
+            \end{prop}
+            \begin{proof}
+                Let $R, S$ be two sieves on $U$ such that $S \subseteq R$ and $S \in \Scov_U$; let's prove that also $R \in \Scov_U$. For each $f\colon V \to U \in S(V)$, by the axiom $\mathbf{GT3}$, we know that $S \times_U V \in \Scov_V$ and, by the \cref{lemma:fibered_product_inner_sieve}, $h_V = S \times_U V \subseteq R \times_U V \subseteq h_V$ so that $R \times_U V = h_V \in \Scov_V$ by $\mathbf{GT1}$. By $\mathbf{GT4}$ we can then conclude that also $R \in \Scov_U$.
+            \end{proof}
+
+            Let's now prove another useful lemma.
+            \begin{lemma}
+                \label{lemma:fibered_product_sieve}
+                Let $\Ucal$ be a covering of $U$ in $\Cat$ and $f\colon V \to U$ a morphism. If $\exists \Ucal \times_U V \in \Cat$, then $h_{\Ucal} \times_U V = h_{\Ucal \times_U V}$.
+            \end{lemma}
+            \begin{proof}
+                Using the definition of fibered product in $\Chat$, as explained in $\mathbf{GT3}$, we obtain $(h_{\Ucal} \times_U V)(W) = \{\alpha\colon W \to V \mid f \circ \alpha = \phi \in h_{\Ucal}(W)\}$ so that $\phi$ factorizes through some $\beta_i\colon U_i \to U \in \Ucal$ as drawn here 
+                \begin{diag}
+                    W \arrow[r, "g"] \arrow[d, "\alpha"] \arrow[dr, "\phi"] & U_i \arrow[d, "\beta_i"] \\
+                    V \arrow[r, "f"] & U 
+                \end{diag}
+                and hence, by the universal property of pullbacks, we obtain 
+                \begin{diag}
+                    W \arrow[ddr, "\alpha" left] \arrow[dr, dashed] \arrow[drr, "g"] & & \\
+                    & V \times_U U_i \arrow[d] \arrow[r] & U_i \arrow[d, "\beta_i"] \\
+                    & V \arrow[r, "f"] & U 
+                \end{diag}
+                so that $\alpha$ factorizes through $V \times_U U_i \to V \in \Ucal \times_U V$ and hence $h_{\Ucal} \times_U V \subseteq h_{\Ucal \times_U V}$. The converse is also evident from the preceeding diagrams, so we conclude $h_{\Ucal \times_U V} = h_{\Ucal} \times_U V$.
+            \end{proof}
+        
+        \subsection{Relations between topologies and pretopologies}
+            Let's now investigate, after having given the basic definition of Grothendieck pretopologies and topologies, the relations between them.
+            \begin{thm}
+                \label{thm:pretop_to_top}
+                Let $\Cat$ be a category endowed with a Grothendieck pretopology $\Pcal$. Define \[\Scov_U \coloneqq \left\{S \subseteq h_U \mid \exists \Ucal \text{ $U$-covering in $\Pcal$ such that $h_{\Ucal} \subseteq S$} \right\} \] for each $U \in \Cat$. This defines a Grothendieck topology $\Tcal_{\Pcal}$. In particular, equivalent pretopologies as in \cref{defn:equivalent_pretopologies}, define the same Grothendieck topology.
+            \end{thm}
+            \begin{proof}
+                Let's first prove that $\Tcal_{\Pcal}$ is a well defined Grothendieck topology, i.e.\ it respects the four axioms.
+                \begin{enumerate}
+                    \item[$\mathbf{GT1}$] Consider $\Ucal = \{\phi\colon V \to U\}$ with $\phi$ an isomorphism. By $\mathbf{PG1}$, $\Ucal$ is a $U$-covering in $\Pcal$, to which we can associate $h_{\Ucal} \subseteq h_U$. Observe that for any $\alpha\colon W \to U$ we have 
+                    \begin{diag}
+                        W \arrow[d, "\alpha"] \arrow[drr, "\alpha"] & & \\
+                        V \arrow[r, "\phi"] & U \arrow[r, "\phi^{-1}"] & V
+                    \end{diag} 
+                    so that $\alpha$ factorizes through $\Ucal$. This proves $h_{\Ucal} = h_U \in \Scov_U$, by definition.
+
+                    \item[$\mathbf{GT2}$] Consider $S_1 \subseteq S_2$ two sieves on $U$ and such that $S_1 \in \Scov_U$. Then, for some $\Ucal \in \Pcal$, we have $h_{\Ucal} \subseteq S_1 \subseteq S_2 \subseteq h_U$ and hence also $S_2 \in \Scov_U$.
+                    \item[$\mathbf{GT3}$] Consider $f\colon V \to U$ in $\Cat$ and let $S$ be a covering sieve on $U$; by definition $\exists \Ucal = \{U_i \to U\} \in \Pcal$ such that $h_{\Ucal} \subseteq S$. By $\mathbf{PG2}$ we know that $\Ucal \times_U V \in \Pcal$ is a $V$-covering; let's prove that $h_{\Ucal \times_U V} \subseteq S \times_U V$ (so that $S \times_U V \in \Scov_V$). By \cref{lemma:fibered_product_sieve} we have $h_{\Ucal \times_U V} = h_{\Ucal} \times_U V \subseteq S \times_U V$ (fibered product mantains subobject relations) and thus we conclude.
+                    \item[$\mathbf{GT4}$] Consider $S_1, S_2$ two sieves on $U$ and such that $S_2 \in \Scov_U$, so that $h_{\Ucal} \subseteq S$ for some $\Ucal = \{U_i \stackrel{\beta_i}{\to} U\} \in \Pcal$. Suppose also that for any $f\colon V \to U \in S_2(V)$ we know that $S_1 \times_U V \in \Scov_V$, i.e.\ $h_{\Vcal} \subseteq S_1 \times_U V$ for some $V$-covering $\Vcal$. In particular let's focus on maps $\beta_i\colon U_i \to U \in h_{\Ucal}(U_i)$ and call the respective coverings (obtained reasoning in the above mentioned way) $\Vcal_i = \{V_{i, j} \stackrel{\gamma_{i,j}}{\to} U_i\}$. 
+                    We can consider now $\Ucal \circ \Vcal = \{V_{i, j} \to U_i \to U\}_{i, j}$, which is a $U$-covering in $\Pcal$ by $\mathbf{PG3}$. Let's prove that $h_{\Ucal \circ \Vcal} \subseteq S_1$, so that we may conclude $S_1 \in \Scov_U$.
+                    By assumption, $S_1 \times_U U_i \in \Scov_{U_i}$. Let's consider any $\alpha \in h_{\Vcal_i}(W) \subseteq (S_1 \times_U U_i)(W)$: we know, from the definition of $S_1 \times_U U_i$, that $\alpha\colon W \to U_i$ is such that $\beta_i \circ \alpha = \phi \in S_1(W)$, i.e.\ we have the following commutative diagram
+                    \begin{diag}
+                        V_{i, j} \arrow[dr, "\gamma_{i,j}" left] & W \arrow[l, "\beta"] \arrow[d, "\alpha"] \arrow[dr, "\phi"] & \\
+                        & U_i \arrow[r, "\beta_i"] & U
+                    \end{diag} 
+                    from which we see that any map $\psi\colon W \to U$ factorizing through $\Ucal \circ \Vcal$  gives rise to some $\delta\colon W \to U_i \in h_{\Vcal_i}(W) \subseteq (S_1 \times_U U_i)(W)$ and hence, by the same reasoning, $\beta_i \circ \delta = \phi \in S_1(W)$, i.e.\ $h_{\Ucal \circ \Vcal} \subseteq S_1$.
+                \end{enumerate}
+                This suffices to prove that $\Tcal_{\Pcal}$ is a Grothendieck topology. Let's now show that if $\Pcal_1 \equiv \Pcal_2$ then they give rise to the same topology. Indeed if $\Pcal_1 \preceq \Pcal_2$ then any $U$-covering $\Ucal \in \Pcal_1$ has a refinement $\Vcal \in \Pcal_2$, which means $h_{\Vcal} \subseteq h_{\Ucal}$. This easily implies that for $S \in \Scov_U(\Tcal_1)$ we have $h_{\Vcal} \subseteq h_{\Ucal} \subseteq S$ so that also $S \in \Scov_U(\Tcal_2)$, i.e.\ $\Tcal_1 \subseteq \Tcal_2$. Using also that $\Pcal_2 \preceq \Pcal_1$ we obtain the desired equality $\Tcal_1 = \Tcal_2$.
+            \end{proof}
+            
+            This theorem gives us a map from pretopologies on $\Cat$ (modulo equivalence) to topologies. With some nice conditions on $\Cat$, this map can be, in some sense, inverted.
+
+            \begin{thm}
+                \label{thm:top_to_pretop}
+                Let $\Cat$ be a category with fibered products. To each Grothendieck topology $\Tcal$ we can associate a saturated Grothendieck pretopology $\Pcal_{\Tcal}$.
+            \end{thm}
+            \begin{proof}
+                The definition is pretty immediate: a $U$-cover for $\Pcal_{\Tcal}$ is a collection of arrows $\Ucal = \{U_i \to U\}$ such that $h_{\Ucal} \in \Scov_U$. Let's now prove that this defines a Grothendieck pretopology, i.e.\ that it satisfies the three axioms.
+                \begin{enumerate}
+                    \item[$\mathbf{PG1}$] By axiom $\mathbf{GT1}$ we have $h_U \in \Scov_U$; consider $\Ucal_{\phi} = \{\phi\colon V \stackrel{\sim}{\to} U \}$ for any isomorphism and observe that $h_{\Ucal_{\phi}} = h_U \in \Scov_U$, so that $\Ucal_{\phi}$ is a $U$-cover in $\Pcal_{\Tcal}$.
+                    \item[$\mathbf{PG2}$] Consider $\Ucal = \{U_i \stackrel{\beta_i}{\to} U\}$ a $U$-cover in $\Pcal_{\Tcal}$, so that $h_{\Ucal} \in \Scov_U$, and $f\colon V \to U$ in $\Cat$. By axiom $\mathbf{GT3}$ we have $h_{\Ucal} \times_U V \in \Scov_V$ and, by \cref{lemma:fibered_product_sieve}, $h_{\Ucal} \times_U V = h_{\Ucal \times_U V}$, proving that $\Ucal \times_U V$ is a $V$-covering in $\Pcal_{\Tcal}$.
+                    \item[$\mathbf{PG3}$] Consider the $U$-covering $\Ucal = \{U_i \stackrel{\beta_i}{\to} U\}$ and the $U_i$-covering $\Vcal_i = \{V_{i,j} \stackrel{\beta_{i,j}}{\to} U_i\}$  in $\Pcal_{\Tcal}$. Consider the sieves $S_1 = h_{\Ucal \circ \Vcal}$ and $S_2 = h_{\Ucal} \in \Scov_U$. We just need to prove that $S_1 \in \Scov_U$. To do this, we use $\mathbf{GT4}$, and so we need to prove that for any $f\colon V \to U \in S_2(V)$ we have $S_1 \times_U V \in \Scov_V$. From \cref{lemma:fibered_product_inner_sieve} we can write $S_1 \times_U V = h_{\Ucal \circ \Vcal} \times_U V = h_{(\Ucal \circ \Vcal) \times_U V}$. By assumption on $f \in S_2(V)$ we know that there exists $i$ such that $f$ factorizes as $V \to U_i \stackrel{\beta_i}{\to} U$; by axiom $\mathbf{PG2}$ we know that $\Vcal_i \times_{U_i} V$ (using the first arrow above) is a $V$-covering in $\Pcal_{\Tcal}$. We will now prove that $\Vcal_i \times_{U_i} V \subseteq (\Ucal \circ \Vcal) \times_U V$ and this indeed suffices to conclude: in-fact, from this, it descends that $h_{\Vcal_i \times_{U_i} V} \subseteq h_{\Ucal \circ \Vcal} \times_U V$ and, since $h_{\Vcal_i \times_{U_i} V} \in \Scov_V$, we conclude that also $h_{\Ucal \circ \Vcal} \times_U V \in \Scov_V$ by axiom $\mathbf{GT2}$.
+                    So let's now prove that $\Vcal_i \times_{U_i} V \subseteq (\Ucal \circ \Vcal) \times_U V$. The first set contains, varying $j$, these arrows
+                    \begin{diag}
+                        V \times_{U_i} V_{i,j} \arrow[r] \arrow[d, "\in \Vcal_i \times_{U_i} V"] & V_{i, j} \arrow[d, "\beta_{i,j}"] \\
+                        V \arrow[r] \arrow[dr, "f"] & U_i \arrow[d, "\beta_i"] \\
+                        & U
+                    \end{diag}
+                    while $(\Ucal \circ \Vcal) \times_U V$ is defined, varying $h$ and $k$, by 
+                    \begin{center} \begin{tikzcd}[column sep = large]
+                        V \times_U V_{h,k} \arrow[d, "\in (\Ucal \circ \Vcal) \times_U V"] \arrow[r] & V_{h, k} \arrow[d, "\in (\Ucal \circ \Vcal)"] \arrow[r, "\beta_{h,k}"] & U_h \arrow[dl, "\beta_h"] \\
+                        V \arrow[d] \arrow[r, "f"] & U & \\
+                        U_i \arrow[ur, "\beta_i"] & & 
+                    \end{tikzcd}\end{center}
+                    and for $h = i, k = j$ we see that $\Vcal_i \times_{U_i} V \subseteq (\Ucal \circ \Vcal) \times_U V$.
+                \end{enumerate}
+                Let's finally prove that $\Pcal_{\Tcal}$ is saturated: if $\Ucal$ has a refinement $\Vcal$ in $\Pcal_{\Tcal}$ then $h_{\Vcal} \subseteq h_{\Ucal}$ and $h_{\Vcal} \in \Scov_U$ by definition; using $\mathbf{GT2}$ we also have $h_{\Ucal} \in \Scov_U$, which proves $\Ucal \in \Pcal_{\Tcal}$.
+            \end{proof}
+
+            Let's observe that, in the proof of \cref{thm:pretop_to_top} in $\mathbf{GT1}$, we only used that $\phi$ has a section (i.e.\ that $\phi$ is a retraction). In general any retraction $\pi\colon V \twoheadrightarrow U$ forms a covering for any saturated Grothendieck pretopology becuase $h_{\{\pi\colon V \twoheadrightarrow U\}} = h_U$.
+
+            Let's try to summarize the correspondence between Grothendieck topologies and pretopologies (we'll feel free to assume, when needed, that $\Cat$ has fibered products).
+            \begin{prop}
+                We have defined the following two maps 
+                \begin{align*}
+                    \left\{\text{Grothendieck topologies on $\Cat$}\right\} &\longleftrightarrow \left\{\text{Grothendieck pretopologies on $\Cat$} \right\} \\
+                    \text{Sieves $S$ in $\Scov_U$} &\longmapsto \text{$U$-coverings $\Ucal$ s.t.\ $h_{\Ucal} \in \Scov_U$}\\
+                    \text{Sieves $S'$ s.t.\ $h_{\Ucal} \subseteq S'$} &\longmapsfrom \text{$U$-coverings $\Ucal$}
+                \end{align*}
+                From a pretopology, applying the two maps, we have $\Pcal \mapsto \Tcal_{\Pcal} \mapsto \overline{\Pcal}$ (it is the saturation of $\Pcal$). Instead, from a topology, applying the two maps, we have $\Tcal \mapsto \Pcal_{\Tcal} \mapsto \Tcal$. In particular, in this last case, each sieve $S'$ is $h_{\Ucal}$ for some $\Ucal = \{U_i \to U\} \in \Pcal_{\Tcal}$.
+            \end{prop}
+            \begin{proof}
+                We'll just prove the last assertion. Let $S' \in \Scov_U$ in $\Tcal_{\Pcal_{\Tcal}}$ and define $\Ucal = \{V \stackrel{f}{\to} U \mid f \in S'(V),\, \forall V \in \Cat\}$. Observe that $\Ucal \in \Pcal_{\Tcal}$: this pretopology is saturated and, by assumption, $h_{\Vcal} \subseteq S'$ for some $U$-covering $\Vcal$; the set $\{V \to U \in h_{\Vcal}(V) \mid \forall V \in \Cat\} \subseteq \Ucal$  is in $\Pcal_{\Tcal}$ ($\Vcal$ is a subset of it, so it is a refinement of it) and hence also $\Ucal \in \Pcal_{\Tcal}$ (it is saturated). We will prove that $S' = h_{\Ucal}$. To prove $S' \subseteq h_{\Ucal}$ observe that $g \in S'(W)$ factorizes as 
+                \begin{diag}
+                    W \arrow[d, "\id_W"] \arrow[dr, "g"] & \\
+                    W \arrow[r, "g"] & U
+                \end{diag}
+                so that $g \in h_{\Ucal}(W)$. Conversely, consider $g' \in h_{\Ucal}(W')$ which can then be written as 
+                \begin{diag}
+                    W' \arrow[d] \arrow[dr, "g"] & \\
+                    V \arrow[r, "f \in S'(V)"] & U
+                \end{diag}
+                and, using the absorbing property of sieves, we may conclude that $g' \in S'(W')$. 
+            \end{proof}
+
+            The main use of this last proposition is the useful fact that to know a certain Grothendieck topology one needs only to know the coverings of the associated saturated pretopology.
+    \section{Sheaves on Grothendieck topologies}
+        Using the concept of Grothendieck topologies we will be able to generalize the definition of sheaves on a topological space. Let's recall that a functor $P\colon \oop(X)^{\op} \to \Set$ is called a presheaf of sets on $X \in \Top$ (the category $\oop(X)$ is just the poset of open sets of $X$). If $P$ satisfies certain conditions (separability and a glueing condition) then it is called a sheaf of sets on $X$. For brevity we'll assume the reader to be familiar with classical sheaves on topological spaces and we'll immediately dive in the general cases.
+
+        \begin{defn}
+            Let $\Cat$ be a site. A \emph{presheaf} (of sets) on $\Cat$ is a functor $F\colon \Cop \to \Set$. We say that $F$ is a \emph{sheaf} if it respects the following conditions:
+            \begin{enumerate}
+                \item[\textbf{S0}] if $\Cat$ has an initial object $\emptyset_{\Cat}$ (so that it is a terminal object in $\Cop$) then $F(\emptyset_{\Cat}) = \{pt\}$ (this property is redundant, i.e.\ it can be proved using the other axioms; it can also be stated, more elegantly, that $F$ preserves terminal object);
+                \item[\textbf{S1}] given a covering $\{U_i \stackrel{\alpha_i}{\to} U\}$ and two sections $s, t \in F(U)$, if $\restr{s}{U_i} = \restr{t}{U_i}$ for each $i$ (here the restriction we consider is $F(\alpha_i)$), then $s = t$;
+                \item[\textbf{S2}] given a covering $\{U_i \to U\}$ and a family $\{s_i \in F(U_i)\}$ satisfying $\restr{s_i}{U_i \times_U U_j} = \restr{s_j}{U_i \times_U U_j}$ for each $i, j$, then there exists a (unique) section $s \in F(U)$ such that $\restr{s}{U_i} = s_i$ for each $i$.
+            \end{enumerate}
+        \end{defn}
+
+        \begin{defn}
+            Call $\Psh(\Cat) \coloneqq \funct(\Cop, \Set)$ the category of presheaves of sets on $\Cat$ and $\Sh(\Cat)$ the category of sheaves on $\Cat$ (morphism are natural transformations so it is a full subcategory of $\Psh(\Cat)$). The category of sheaves on a site is often called \emph{topos}.
+        \end{defn}
+
+        We can also give an alternative, and maybe more immediate, definition of sheaf; given a covering $\Ucal = \{U_i \to U\}$ and a presheaf $F \in \Psh(\Cat)$ define $F(\Ucal)$ as equalizer (similar universal property as kernels) as follows
+        \begin{diag}
+            F(\Ucal) \arrow[r, hookrightarrow] & \prod_i F(U_i) \arrow[r, shift left] \arrow[r, shift right] & \prod_{i,j} F(U_i \times_U U_j)
+        \end{diag}
+        where the two last arrows $p_1, p_2$ are defined, respectively, by $F(U_i \times_U U_j \to U_i)$ and $F(U_i \times_U U_j \to U_j)$. This definition means that the diagram above is commutative and for any $f\colon X \in \Cat \to \prod_i F(U_i)$ such that $p_1\circ f = p_2 \circ f$ there exists a unique factorization of $f$ through $F(\Ucal)$. We can then define, using the covering maps $U_i \to U$, a map $F(U) \to F(\Ucal)$ (a priori it is a map $F(U) \to \prod_i F(U_i)$ but we see that, composed with $p_1$ and $p_2$, we obtain the same map). 
+        \begin{prop}
+            A functor $F\colon \Cop \to \Set$ is a sheaf (for the Grothendieck pretopology $\Pcal$) if and only if, for every covering $\Ucal$, the induced map $F(U) \to F(\Ucal)$ is an isomorphism.
+        \end{prop}
+
+        Let's now prove a theorem which can seem a generalization of the Yoneda lemma for sites.
+        \begin{thm}
+            \label{thm:yoneda_sheaves}
+            Let $\Cat$ be a site and $F \in \Psh(\Cat)$, and fix a $U$-covering $\Ucal = \{U_i \to U\}$. Then there exists a canonical bijection (in $\Set$) $R\colon \Hom_{\Chat}(h_{\Ucal}, F) \cong F(\Ucal)$. In particular we have this commutative diagram 
+            \begin{diag}
+                \Hom_{\Chat}(h_U, F) \arrow[r, "Yoneda"] \arrow[d] & F(U) \arrow[d] \\
+                \Hom_{\Chat}(h_{\Ucal}, F) \arrow[r, "R"] & F(\Ucal)
+            \end{diag}
+            where the above arrow is the Yoneda isomorphism (the others, except for $R$, are natural maps induced by $h_{\Ucal} \subseteq h_U$ and $F(U) \to F(U_i)$).
+        \end{thm}
+        \begin{proof}
+            Let $\Phi\colon h_{\Ucal} \to F$ a natural transformation (i.e.\ an element of $\Hom_{\Chat}(h_{\Ucal}, F)$) and, for each $i$, let's consider the map $U_i \to U \in \Ucal$ which clearly belongs to $h_{\Ucal}(U_i)$. Define $R(\Phi) \coloneqq (\Phi(U_i \to U))_i \in \prod_i F(U_i)$ (actually we mean $(\Phi(U_i)(U_i \to U))$ but it is clear anyway). To prove that $R(\Phi) \in F(\Ucal)$ we can consider for each $i, j$ the restrictions $\restr{\Phi(U_i \to U)}{U_i \times_U U_j}$ and $\restr{\Phi(U_j \to U)}{U_i \times_U U_j}$ and observe that they both coincide with $\Phi(U_i \times_U U_j \to U)$, so that $R(\Phi)$ actually is in $F(\Ucal)$. Indeed we can just consider the commutative diagram (we draw for $i$ then we have the same replacing $i$ with $j$):
+            \begin{diag}
+                h_{\Ucal}(U_i) \arrow[r, "\Phi(U_i)"] \arrow[d, "(U_i \times_U U_j \to U_i) \circ " left] & F(U_i) \arrow[d, "F(U_i \times_U U_j \to U_i)"] \\
+                h_{\Ucal}(U_i \times_U U_j) \arrow[r, "\Phi(U_i \times_U U_j)"] & F(U_i \times_U U_j)
+            \end{diag}
+            We have defined hence a map $R\colon \Hom_{\Chat}(h_{\Ucal}, F) \to F(\Ucal)$, let's now prove it is a bijection. For injectivity we can consider two natural transformations $\Phi, \Psi\colon h_{\Ucal} \to F$ such that $R(\Phi) = R(\Psi)$. Given $T \to U \in h_{\Ucal}(T)$ we can find a factorization $T \stackrel{f}{\to} U_i \to U$ and, since they are both natural transformations, we have 
+            \[\Phi(T \to U) = F(f)(\Phi(U_i \to U)) = F(f)(\Psi(U_i \to U)) = \Psi(T \to U) \] and this proves $\Phi = \Psi$, i.e.\ that $R$ is injective. For surjectivity consider $(\chi_i)_i \in F(\Ucal)$: we want to define a natural transformation $h_{\Ucal} \to F$ whose $R$ is $(\chi_i)_i$. As before, consider $T \to U \in h_{\Ucal}(T)$ which we can factorize as $T \stackrel{f}{\to} U_i \to U$; we can then consider the element $F(f)(\chi_i) \in F(T)$ and we observe that this element does not depend on the chosen factorization. Infact chosen another factorization $T \stackrel{g}{\to} U_j \to U$ then we can factorize $T$ through $U_i \times_U U_j$ and, appying $F$ to this pullback diagram, we obtain 
+            \begin{diag}
+                F(T) & & \\
+                & F(U_i \times_U U_j) \arrow[ul, dashed] & F(U_j) \arrow[l] \arrow[ull, "F(g)" right] \\
+                & F(U_i) \arrow[u] \arrow[luu, "F(f)"] & F(U) \arrow[u] \arrow[l]
+            \end{diag}
+            from which we see $F(f)(\chi_i) = F(g)(\chi_j)$ (use that $\chi_i$ and $\chi_j$ coincide when mapped to $F(U_i \times_U U_j)$ by assumption). Thus we have defined a map $h_{\Ucal}(T) \to F(T)$ for each $T$ and it is clear that it is natural, i.e.\ it is a natural transformation $\Phi\colon h_{\Ucal} \to F$ and $R(\Phi) = (\chi_i)_i$ (choose, as a factorization of $U_i \to U$, the trivial one), so that $R$ is also surjective.
+         \end{proof}
+         \begin{corollary}
+             \label{corollary:sheaf_bijection_top}
+             Let $\Cat$ be a site; a presheaf $F \in \Psh(\Cat)$ is a sheaf if and only if for each covering $\Ucal = \{U_i \to U\}$ the induced map $\Hom_{\Chat}(h_U, F) \to \Hom_{\Chat}(h_{\Ucal}, F)$ is bijective.
+         \end{corollary}
+
+         We have seen the definitions of sheaves on $\Cat$ all related to the Grothendieck pretopology, let's now try to translate them in topological terms.
+         \begin{defn}
+             \label{defn:sheaves_top}
+             A presheaf $F \in \Psh(\Cat)$ is a separated presheaf (i.e.\ satisfying \textbf{S1}) in the Grothendieck topology $\Tcal$ if for every $U \in \Cat$ and $S \in \Scov_U$ the induced map $\Hom_{\Chat}(h_U, F) \to \Hom_{\Chat}(S, F)$ is injective; $F$ is a sheaf if and only if such map is also bijective.
+         \end{defn}
+         Let's now show that this new definition is coherent with the old ones. We'll need a little lemma before.
+         \begin{lemma}
+             \label{lemma:separated_presheaf_top}
+             If $F$ is a separated presheaf for the pretopology $\Pcal_{\Tcal}$ (associated to the Grothendieck topology $\Tcal$), $h_{\Ucal} \subseteq S \subseteq h_U$, then $\Hom_{\Chat}(S, F) \to \Hom_{\Chat}(h_{\Ucal}, F)$ is injective.
+         \end{lemma}
+         \begin{proof}
+             Let's consider two natural transformations $\Phi, \Psi\colon S \to F$ having the same image in $\Hom_{\Chat}(h_{\Ucal}, F)$ and fix $T \to U \in S(T)$. Let $\Ucal = \{U_i \to U\}$ and consider the fibered products $T \times_U U_i$, with $p_i$ being the projections on $T$. The map $T \times_U U_i \to U$ is an element of $h_{\Ucal}(T \times_U U_i)$ since it factorizes as $T \times_U U_i \stackrel{p_i}{\to} U_i \to U$. We have \[F(p_i)\Phi(T \to U) = \Phi(T \times_U U_i \to U) = \Psi(T \times_U U_i \to U) = F(p_i)\Psi(T \to U) \] and, since $\{p_i\colon T \times_U U_i \to T\}_i$ is a $T$-covering by $\mathbf{PG2}$ and $F$ is separated, we can conclude $\Phi(T \to U) = \Psi(T \to U)$, i.e.\ $\Phi = \Psi$ and hence the map is injective.
+         \end{proof}
+         \begin{prop}
+             A functor $F\colon \Cop \to \Set$ is a sheaf for the topology $\Tcal$ if and only if $F$ is a sheaf for the associated pretopology $\Pcal_{\Tcal}$.
+         \end{prop}
+         \begin{proof}
+             Suppose $F$ is a sheaf for the topology $\Tcal$; by definition $\Hom_{\Chat}(h_U, F) \cong \Hom_{\Chat}(S, F)$ for each sieve $S \in \Scov_U$. Considering the sieves of the form $h_{\Ucal} \in \Scov_U$ we can then conclude using \cref{corollary:sheaf_bijection_top}.
+             Suppose instead $F$ is a sheaf for the pretopology $\Pcal_{\Tcal}$, fix a covering sieve $S \in \Scov_U$ and choose a $U$-covering $\Ucal$ in $\Pcal_{\Tcal}$ such that $h_{\Ucal} \subseteq S \subseteq h_U$. We can consider the composition $\Hom_{\Chat}(h_U, F) \to \Hom_{\Chat}(S, F) \to \Hom_{\Chat}(h_{\Ucal}, F)$ which is a bijection (by functoriality) for \cref{corollary:sheaf_bijection_top}. Using \cref{lemma:separated_presheaf_top} we know that $\Hom_{\Chat}(S, F) \to \Hom_{\Chat}(h_{\Ucal}, F)$ is injective and, by what we said above, it must also be surjective, so that it is bijective and hence $F$ is a sheaf also for the topology $\Tcal$.
+         \end{proof}
+
+         We can finally give a condition for the equivalence of Grothendieck pretopologies using sheaves.
+         \begin{prop}
+             Given two Grothendieck pretopologies $\Pcal_1, \Pcal_2$ on $\Cat$, if $\Pcal_1 \preceq \Pcal_2$ then every sheaf for $\Pcal_2$ is also a sheaf for $\Pcal_1$. In particular, equivalent pretopologies have the same sheaves.
+         \end{prop}
+         We see hence that, for sheaves, what really matters is the topology, not the pretopology.
+         We know, from standard theory of sheaves on topological spaces, that the full embedding $\iota\colon \Sh(\oop(X)) \hookrightarrow \Psh(\oop(X))$ has a left adjoint $^a\colon \Psh(\oop(X)) \to \Sh(\oop(X))$, the so-called ``sheafification'' functor. A similar functor also exists in the general contest, but we will only state the theorem without proving it (it would require a bit of work).
+         \begin{thm}
+             Let $\Cat$ be a category endowed with a Grothendieck topology $\Tcal$; there exists a canonical functor 
+             \begin{gather*}
+                 \Fcal\colon \Psh(\Cat) \to \Sh(\Cat), \qquad F \mapsto (F^+)^+
+             \end{gather*}
+             sending every presheaf $F$ to a sheaf $(F^+)^+$ and such that, for any $\phi\colon F \to G$ morphism of presheaves with $G$ being a sheaf, there exists a unique morphism of sheaves $\psi\colon \Fcal(F) \to G$ making the following diagram commutative 
+             \begin{diag}
+                 F \arrow[r, "\Fcal_F"] \arrow[dr, "\phi"] & \Fcal(F) \arrow[d, dashed, "\exists !\psi"]\\
+                 & G
+             \end{diag}
+         \end{thm}
+         The idea is that given a presheaf $F$ we can build a separated presheaf $F^+$ and, repeating again the construction, we obtain $(F^+)^+$ which will be a sheaf. The functor $^+\colon \Psh(\Cat) \to \Psh(\Cat)$ is defined setting \[F^+\colon \Cop \to \Set, \qquad U \mapsto \ilim_{S \in \Scov_U} \Hom_{\Chat}(S, F) \] so that an element of $F^+(U)$ is an equivalence class of natural transformations, where two natural transformations $\tau\colon S \to F$ and $\rho\colon R \to F$, with $S, R \in \Scov_U$, are equivalent if $\exists T \subseteq S \cap R$ in $\Chat$ such that $T \in \Scov_U$ and $\restr{\tau}{T} = \restr{\rho}{T}$. 
+    \section{The canonical topology}
+         The point of view here will be a little different than before: we know the sheaf condition for $F$ on a certain topology $\Tcal$, now we want to find a topology such that a certain family of presheaves is actually a family of sheaves and, in particular, we want to find the finest topology among these.
+         \begin{defn}
+             Let $\Tcal_1, \Tcal_2$ be two Grothendieck topologies on a category $\Cat$. We say that $\Tcal_1$ is \emph{finer} than $\Tcal_2$ if for every $U \in \Cat$ we have $\Scov_U(\Tcal_2) \subseteq \Scov_U(\Tcal_1)$.
+         \end{defn}
+         Let's now state and prove a fundamental fact.
+         \begin{prop}
+             Let $\Cat$ be a category, $\Fcal = \{F_i\colon \Cop \to \Set\}_{i \in I}$ a family of presheaves such that, if $\exists \emptyset_{\Cat} \in \Cat$ (initial object of $\Cat$), $F_i(\emptyset_{\Cat}) = \{pt\}$ for each $i \in I$. For every $U \in \Cat$ define $\Fcal\Scov_U$ to be the family of all sieves $S \subseteq h_U$ satisfying \[\forall V \stackrel{f}{\to} U,\quad \Hom_{\Chat}(h_V, F_i) \simeq \Hom_{\Chat}(S \times_U V, F_i) \quad \forall i \in I \] the morphism being induced by the natural map $S \times_U V \hookrightarrow V \simeq h_V$. Then 
+             \begin{enumerate}
+                 \item The datum $\{\Fcal\Scov_U\}_{U \in \textrm{Ob}(\Cat)}$ is a Grothendieck topology $\Tcal_{\Fcal}$ on $\Cat$.
+                 \item All the $F_i$'s are sheaves for $\Tcal_{\Fcal}$.
+                 \item $\Tcal_{\Fcal}$ is the finest topology such that all the $F_i$'s are sheaves.
+             \end{enumerate}
+         \end{prop}
+         \begin{proof}
+             Let's first prove that $\Tcal_{\Fcal}$ satisfies all the axioms of Grothendieck topologies (we can ignore $\mathbf{GT2}$ thanks to \cref{prop:no_gt2}). 
+             
+             For $\mathbf{GT1}$ consider $U \in \Cat$ and an arrow $f\colon V \to U$; we have $h_U \times_U V = h_V$ (easy to see) so $\Hom_{\Chat}(h_U \times_U V, F_i) \simeq \Hom_{\Chat}(h_V, F_i)$ and hence $h_U \in \Fcal\Scov_U$. 
+
+             For $\mathbf{GT3}$ let $S \in \Fcal\Scov_U$ and $f\colon V \to U$ be a morphism in $\Cat$; let's prove that for any $g\colon W \to V$ we have $(S \times_U V) \times_V W = S \times_U W$. This is a general fact (one can exchange two projective limits), anyway here it can be deduced from this commutative diagram (using different times the universal property of pullbacks)
+             \begin{diag}
+                 S \times_U W \arrow[dddr] \arrow[ddr, dashed, "\exists !", red, shift right] \arrow[ddrr, dashed] \arrow[ddrrr] & & & \\
+                 & & & \\
+                 & (S \times_U V) \times_V W \arrow[uul, dashed, "\exists !", blue, shift right] \arrow[d] \arrow[r] & S \times_U V \arrow[d] \arrow[r] & S \arrow[d] \\
+                 & W \arrow[r, "g"] & V \arrow[r, "f"] & U
+             \end{diag}
+             Thus we have $\Hom_{\Chat}((S \times_U V) \times_V W, F_i) \simeq \Hom_{\Chat}(S \times_U W, F_i) \simeq \Hom_{\Chat}(h_W, F_i)$ (last equality holds because $S \in \Fcal\Scov_U$) and this proves that $S \times_U V \in \Fcal\Scov_V$.
+
+             For $\mathbf{GT4}$ we will have to work a little longer; let's first observe that we just need to prove the two following facts:
+             \begin{enumerate}[label=(\alph*)]
+                \item let $S_1 \subseteq S_2 \subseteq h_U$ be two sieves on $U$, if $S_2 \in \Fcal\Scov_U$ and, for every $f\colon V \to U \in S_2(V)$, we have $S_1 \times_U V \in \Fcal\Scov_V$, then $S_1 \in \Fcal\Scov_U$;
+                \item let $S_1 \subseteq S_2 \subseteq h_U$ be two sieves on $U$, if $S_1 \in \Fcal\Scov_U$ then $S_2 \in \Fcal\Scov_U$.
+             \end{enumerate}
+             Let's observe that (a) is a particular instance of $\mathbf{GT4}$ while (b) is exactly $\mathbf{GT2}$. Let's now show how we can conclude using (a) and (b): consider $S_1, S_2$ two sieves on $U$ such that $S_2 \in \Fcal\Scov_U$ and that for every $f\colon V \to U \in S_2(V)$, $S_1 \times_U V \in \Fcal\Scov_V$. If $S_1 \subseteq S_2$ we just use (a) and we conclude; instead if $S_1 \not\subseteq S_2$ we can consider the sieve $S_1 \cup S_2 \subseteq h_U$ (coproduct of $S_1, S_2$ in $\Chat$) and we obtain $(S_1 \cup S_2)(W) = \{\alpha\colon V \to U \mid \alpha \in S_1(W) \lor \alpha \in S_2(W)\} = S_1(W) \cup S_2(W)$. Since, clearly, $S_2 \subseteq S_1 \cup S_2$ by point (b) we have $S_1 \cup S_2 \in \Fcal\Scov_U$. For every $\alpha\colon V \to U \in (S_1 \cup S_2)(V)$, if $\alpha \in S_1(V)$ we have, by \cref{lemma:fibered_product_inner_sieve}, $S_1 \times_U V = h_V \in \Fcal\Scov_V$ by $\mathbf{GT1}$; if instead $\alpha \in S_2(W)$, by assumption $S_1 \times_U V \in \Fcal\Scov_V$. So by point (a) we conclude $S_1 \in \Fcal\Scov_U$, proving the axiom $\mathbf{GT4}$.
+             Now we have only to prove the two claims above. Since the functor $\Hom_{\Chat}(\bullet, F_i)$ commutes with pullbacks, it suffices to prove the following facts 
+             \begin{gather*}
+                 \Hom_{\Chat}(h_U, F_i) \simeq \Hom_{\Chat}(S_1, F_i) \quad \forall i \in I \text{ for (a), }\\
+                 \Hom_{\Chat}(h_U, F_i) \simeq \Hom_{\Chat}(S_2, F_i) \quad \forall i \in I \text{ for (b). }
+             \end{gather*}
+             To do this, let's prove a general fact (i.e.\ holding both in (a) and in (b)) that $S_1 \subseteq S_2$ induces, for each $i \in I$, a map \[\alpha\colon \Hom_{\Chat}(S_2, F_i) \to \Hom_{\Chat}(S_1, F_i) \qquad (\star) \] and $\alpha$ is always an isomorphism. Let's observe that, in both cases, for each $f\colon V \to U \in S_2(V)$ we have $S_2 \times_U V = h_V$ (by \cref{lemma:fibered_product_inner_sieve}) and $S_1 \times_U V \in \Fcal\Scov_V$ by assumption (in (a)) and by $\mathbf{GT3}$ (in (b)). Thus we have \[F_i(V) \stackrel{\textrm{Yoneda}}{\simeq} \Hom_{\Chat}(h_V, F_i) \simeq \Hom_{\Chat}(S_2 \times_U V, F_i) \simeq \Hom_{\Chat}(S_1 \times_U V, F_i) \qquad (\star\star) \] where $\eta\colon h_V \to F_i$ is sent to $\eta_{S_1 \times_U V}\colon S_1 \times_U V \hookrightarrow h_V \stackrel{\eta}{\to} F_i$.
+             Let's first prove $\alpha$ is injective, and consider $\eta_1, \eta_2 \in \Hom_{\Chat}(S_2, F_i)$ such that $\alpha(\eta_1) = \alpha(\eta_2)$, i.e.\ $\restr{\eta_2}{S_1} = \restr{\eta_1}{S_1}$. This means that for every $W \in \Cat$ and for each $g \in S_1(W)$, we have $\eta_2(W)(g) = \eta_1(W)(g)$. To prove $\eta_1 = \eta_2$ we just need to show that for each $V \in \Cat$ and each $f \in S_2(V)$ we have $\eta_1(V)(f) = \eta_2(V)(f)$ in $F_i(V)$. Following the chain of isomorphisms in $(\star)$ we see that $\eta_j(V)(f) \in F_i(V)$ corresponds to the composite 
+             \begin{diag}
+                 S_1 \times_U V \arrow[d] \arrow[drr] & & \\
+                 S_1 \arrow[r, hookrightarrow] & S_2 \arrow[r, "\eta_j"] & F_i
+             \end{diag}
+             and to see this is not too difficult: we must use first the Yoneda isomorphism $\eta_1(V)(f) \mapsto F_i(\bullet)(\eta_1(V)(f))$ and then, given $g\colon W \to V \in (S_1 \times_U V)(W)$ (i.e.\ such that $f\circ g \in S_1(W)$), we observe that, by functoriality, $F_i(g)(\eta_1(V)(f)) = \eta_1(W)(S_2(g)(f)) = \eta_1(W)(f \circ g) = \restr{\eta_1}{S_1}(W)(f \circ g)$. From the above diagram, and from the assumption that $\eta_1$ and $\eta_2$ coincide when restricted to $S_1$, we deduce $\eta_1(V)(f) = \eta_2(V)(f)$ and hence (for all $V$ and $f$) we obtain $\eta_1 = \eta_2$, i.e.\ that the map $\alpha$ is injective.
+
+             Let's now prove that $\alpha$ is surjective; fix $\eta \in \Hom_{\Chat}(S_1, F_i)$ and let's show that $\exists \tilde{\eta} \in \Hom_{\Chat}(S_2, F_i)$ such that $\alpha(\tilde{\eta}) = \restr{\tilde{\eta}}{S_1} = \eta$. We must define $\tilde{\eta}(V)(f) \in F_i(V)$ for each $V \in \Cat$ and $f \in S_2(V)$. Since, from $(\star\star)$, we have $F_i(V) \simeq \Hom_{\Chat}(S_1 \times_U V, F_i)$, let's define $\tilde{\eta}(V)(f)$ as the unique element of $F_i(V)$ corresponding to the red arrow which makes the following diagram commute 
+             \begin{diag}
+                 S_1 \times_U V \arrow[r, red] \arrow[d] & F_i\\
+                 S_1 \arrow[ur, "\eta"]
+             \end{diag}
+             We have now to prove that $\tilde{\eta}$ is a natural transformation whose restriction to $S_1$ is exactly $\eta$. 
+             \begin{itemize}
+                 \item Fix $f\colon W \to V$ in $\Cat$, we must prove that for every $i \in I$ the following diagram is commutative.
+                 \begin{center}
+                    \begin{tikzcd}[column sep = large, row sep = large]
+                        S_2(V) \arrow[r, "\tilde{\eta}(V)"]  \arrow[d, "S_2(f)"] & F_i(V) \arrow[d, "F_i(f)"] \\
+                        S_2(W) \arrow[r, "\tilde{\eta}(W)"] & F_i(W)
+                    \end{tikzcd}
+                    \qquad 
+                    \begin{tikzcd}[column sep = large, row sep = large]
+                        g \arrow[r, mapsto] \arrow[d, mapsto] & \tilde{\eta}(V)(g) \arrow[d, mapsto] \\
+                        g \circ f \arrow[r, mapsto] & \tilde{\eta}(W)(g \circ f) \stackrel{?}{=} F_i(f)(\tilde{\eta}(V)(g))
+                    \end{tikzcd}
+                 \end{center}
+                 Let's observe that $g\circ f\colon W \to U \in S_2(W)$ (absorbing property of sieves) and consider the following commutative diagram 
+                 \begin{diag}
+                     F_i(V) \arrow[r, "F_i(f)"] & F_i(W) \\
+                     \Hom_{\Chat}(S_1 \times_U V, F_i) \arrow[u, "(\star\star)_g"] \arrow[r, " \circ (S_1 \times_U f)"] & \Hom_{\Chat}(S_1 \times_U W, F_i) \arrow[u, "(\star\star)_{g \circ f}"]
+                 \end{diag}
+                 where the vertical arrows are isomorphisms by $(\star\star)$ and the map below is the natural map induced by $f$. Using this we will be able to conclude.
+                 Being $F_i$ a presheaf and using the isomorphisms above, we have 
+                 \[F_i(f)(\tilde{\eta}(V)(g)) \simeq F_i(f)(S_1 \times_U V \to S_1 \stackrel{\eta}{\to} F_i) = (S_1 \times_U W \to S_1 \stackrel{\eta}{\to} F_i) \simeq \tilde{\eta}(W)(g \circ f)\] and hence we conclude that $\tilde{\eta}$ is really a natural transformation.
+
+                \item Let $f \in S_1(V) \subseteq S_2(V)$, then $S_1 \times_U V = h_V$ (as usual using \cref{lemma:fibered_product_inner_sieve}) and the following diagram commutes 
+                \begin{diag}
+                    \id_V \in h_V = S_1 \times_U V \arrow[r, mapsto] \arrow[d, mapsto] & \tilde{\eta}(V)(\id_V) = \eta(V)(f) \\
+                    f \in S_1(V) \arrow[ur, mapsto, "\eta(V)"] &
+                \end{diag}
+                and hence, by the definition of $\tilde{\eta}(V)(f)$, we obtain $\tilde{\eta}(V)(f) = \eta(V)(f)$, meaning $\restr{\tilde{\eta}}{S_1} = \eta$.
+             \end{itemize}
+             Finally we can prove the asserts (a) and (b). For (a) let $S_2 \in \Fcal\Scov_U$ so that $\Hom_{\Chat}(h_U, F_i) \simeq \Hom_{\Chat}(S_2, F_i)$ by definition ($S_2 \times_U U = S_2$ using $\id_U\colon U \to U$). Consider the following commutative diagram
+             \begin{diag}
+                 \Hom_{\Chat}(h_U, F_i) \arrow[r, "\simeq"] \arrow[dr, "\beta"] & \Hom_{\Chat}(S_2, F_i) \arrow[d, "\alpha" right, "\simeq" left] \\
+                 & \Hom_{\Chat}(S_1, F_i)
+             \end{diag}
+             and we see that also $\beta$ must be an isomorphism, and this, as we already observed, suffices to prove (a). For (b) let $S_1 \in \Fcal\Scov_U$ so that $\Hom_{\Chat}(h_U, F_i) \simeq \Hom_{\Chat}(S_1, F_i)$. Consider the following commutative diagram
+             \begin{diag}
+                 \Hom_{\Chat}(h_U, F_i) \arrow[r, "\gamma"] \arrow[dr, "\simeq"] & \Hom_{\Chat}(S_2, F_i) \arrow[d, "\simeq" left, "\alpha" right] \\
+                 & \Hom_{\Chat}(S_1, F_i)
+             \end{diag}
+             proving that $\gamma$ is an isomorphism and hence proving (b).
+             We have proved the first part, i.e.\ that our definition is really a Grothendieck topology.
+             As already mentioned, using $f=\id_U\colon U \to U$ the condition on sieves becomes $\Hom_{\Chat}(h_U, F_i) \simeq \Hom_{\Chat}(S, F_i)$ since $S \times_U U = S$. This means exactly that all the presheaves $F_i$ are sheaves for our topology $\Tcal_{\Fcal}$.
+
+             Finally, let $\Tcal$ be a Grothendieck topology on $\Cat$ such that all the $F_i$'s are sheaves. By definition, this means that for each $U \in \Cat$ and $S \in \Scov_U(\Tcal)$ we have \[\Hom_{\Chat}(h_U, F_i) \simeq \Hom_{\Chat}(S, F_i) \qquad \forall i \in I \] and using $\mathbf{GT3}$ (together with the \cref{defn:sheaves_top} of sheaves for topologies) we obtain that for all $f\colon V \to U$ in $\Cat$ we have \[\Hom_{\Chat}(h_V, F_i) \simeq \Hom_{\Chat}(S \times_U V, F_i) \qquad \forall i \in I \] so that $S \in \Fcal\Scov_U$, i.e.\ our topology $\Tcal_{\Fcal}$ is finer than $\Tcal$.
+         \end{proof}
+         Let's give a final definition.
+         \begin{defn}
+             Let $\Cat$ be a category. The \emph{canonical topology} is the finest Grothendieck topology on $\Cat$ such that all representable functors are sheaves, i.e.\ the topology $\Tcal_{\Fcal}$ where $\Fcal = \{h_U\}_{U \in \Cat}$.
+         \end{defn}
+    \section{Examples}
+         In this last section we will try to give some examples of pretopologies and topologies. They won't be too much, since a lot of algebraic geometry (schemes) would be required for the most interesting examples (e.g.\ fpqc topology).
+         \begin{example}[The site of a topological space]
+            \label{example:site_top}
+             Let $X \in \Top$ and consider $\oop(X)$ the category whose object are the open subsets of $X$ and morphisms are given by \[\Hom_{\oop(X)}(U, V) = \begin{cases*}
+                 \{pt\} & \text{if $U \subseteq V$,}\\
+                 \emptyset & \text{otherwise.}
+             \end{cases*} \] Then we can consider the Grothendieck pretopology on $\oop(X)$ where the coverings of $U \in \oop(X)$ are the set of open coverings of $U$. If $U_1 \to U$ and $U_2 \to U$ are morphisms (i.e.\ $U_1, U_2 \subseteq U$) then the fibered product is $U_1 \times_U U_2 = U_1 \cap U_2$.
+         \end{example}
+         \begin{example}[The global classical (pre)topology]
+             Let's consider the category $\Top$. If $U \in \Top$ then define a covering of $U$ to be a jointly surjective collection of open embeddings $U_i \to U$, where by ``open embedding'' we mean an open continuous injective map.
+             Observe that changing this with ``open inclusion of an open subspace'' then $\mathbf{PG1}$ would not be satisfied.
+         \end{example}
+         \begin{example}[The global étale (pre)topology for topological spaces]
+             Let's consider the category $\Top$. If $U \in \Top$ then define a covering of $U$ to be a jointly surjective collection of local homeomorphisms $U_i \to U$.
+         \end{example}
+         One can prove that these two last pretopologies are equivalent, so they define the same Grothendieck topology.
+         Let's now focus on \cref{example:site_top} and try to prove by hand that it is really a pretopology.
+         \begin{enumerate}
+             \item[$\mathbf{PG1}$] The unique possible isomorphism is $U \subseteq U$ which is clearly a covering.
+             \item[$\mathbf{PG2}$] As already observed, in $\oop(X)$, the pullbacks are exactly the set-theoretic intersections; given an open covering $\Ucal = \{U_i \mid U_i \subseteq U\}$ and $V \subseteq U$, then we can consider $\Ucal \cap V = \{U_i \cap V\}$ and it is clear that it is an open covering of $V$, since $\bigcup_i (U_i \cap V) = V$.
+             \item[$\mathbf{PG3}$] Consider the covering $\Ucal = \{U_i \subseteq U \mid \bigcup_i U_i = U\}$ and $\Vcal_i = \{V_{i,j} \subseteq U_i \mid \bigcup_j V_{i,j} = U_i\}$ for each $i$; we must prove that $\Ucal \circ \Vcal$ is a covering of $U$. This is evident since $\bigcup_{i,j} V_{i,j} = U$.
+         \end{enumerate}
+         Finally, let's prove that this is also a saturated pretopology. Indeed, let $\Ucal = \{U_i \to U\}$ and $\Vcal = \{V_j \to U_{i_j} \to U \mid \bigcup_j V_j = U\}$ be a $U$-covering (i.e.\ assume that $\Vcal$ is a covering in our pretopology). Clearly $\Vcal$ is a refinement of $\Ucal$, so that we just need to prove that also $\Ucal$ is a covering for our pretopology. We have the following commutative diagram
+         \begin{diag}
+             V_j \cap U_i \arrow[r, hookrightarrow] \arrow[d, hookrightarrow] & U_i \arrow[d, hookrightarrow] \\
+             V_j \arrow[r, hookrightarrow] & U
+         \end{diag}
+         and from $\bigcup_j V_j = U$ we obtain $\bigcup_i (V_j \cap U_i) = V_j \cap U = V_j$ so that $U = \bigcup_{i,j} (V_j \cap U_i) \subseteq \bigcup_i U_i \subseteq U$. Thus we have $\bigcup_i U_i = U$, i.e.\ $\Ucal$ is a $U$-covering.
+
+         To this saturated pretopology on $\oop(X)$ we can associate a Grothendieck topology $\Tcal_{\oop(X)}$, whose sieves are exactly the $h_{\Ucal}$'s.
+         Finally, let's prove that this defines the canonical topology on $\oop(X)$.
+         \begin{prop}
+             The afore-mentioned topology on $\oop(X)$ is the canonical one.
+         \end{prop}
+         \begin{proof}
+             Let's divide the proof in two steps.
+             \begin{enumerate}
+                 \item Let's first prove that all the $h_U$'s are sheaves for $\Tcal_{\oop(X)}$. Consider a morphism $U \subseteq V$ and a $U$-covering $\Ucal$, we just need to prove \[\Hom_{\oop(X)\,\hat{}}(h_V, h_U) \simeq \Hom_{\oop(X)\,\hat{}}(h_{\Ucal} \times_U V, h_U). \] Let's observe that $\Hom_{\oop(X)\,\hat{}}(h_V, h_U) \simeq \Hom_{\oop(X)}(V, U)$ has only one element if $V \subseteq U$, empty otherwise. We have $h_{\Ucal} \times_U V = h_{\Ucal \cap V}$ and also $\Hom_{\oop(X)\,\hat{}}(h_{\Ucal} \times_U V, h_U) \subseteq \Hom_{\oop(X)\,\hat{}}(h_V, h_U)= \emptyset$ if $V \not\subseteq U$. Thus we can assume that $V \subseteq U$. Since $\Hom_{\oop(X)\,\hat{}}(\bullet, h_U)$ respects fibered products we just need to prove \[\Hom_{\oop(X)\,\hat{}}(h_U, h_U) \simeq \Hom_{\oop(X)\,\hat{}}(h_{\Ucal}, h_U). \] We have $\Hom_{\oop(X)\,\hat{}}(h_U, h_U) = \{U \stackrel{\id_U}{\to} U\}$ and (recalling \cref{thm:yoneda_sheaves}) $\Hom_{\oop(X)\,\hat{}}(h_{\Ucal}, h_U) \simeq h_U(\Ucal) = \{(U_i \stackrel{f_i}{\to} U)_i \in \prod_i h_U(U_i) \mid \restr{f_i}{U_i \cap U_j} = \restr{f_j}{U_i \cap U_j} \quad \forall i,j\}$. Since $\bigcup_i U_i = U$ clearly all these $f_i$'s may be glued to the whole $\id_U$ and this proves our claim.
+                 \item Finally, we need to prove that $\Tcal_{\oop(X)}$ is the finest topology in which the $h_U$'s are sheaves. Suppose, by contradiction, that $\exists \Tcal'$ a finer topology (in which the $h_U$'s are sheaves) which contains $h_{\overline{\Ucal}}$ as a covering sieve, where $\overline{\Ucal} = \{U_i \to U\}$ is such that $\bigcup_i U_i \subsetneq U$ (so that it is not a covering sieve for our topology). Let $V\coloneqq \bigcup_i U_i$, then \[\Hom_{\oop(X)\,\hat{}}(h_U, h_V) = \emptyset, \qquad \Hom_{\oop(X)\,\hat{}}(h_{\overline{\Ucal}}, h_V) = \{\id_V\} \] but this is a contradiction since $h_V$ must be a sheaf.
+             \end{enumerate}
+             This suffices to conclude the proof.
+         \end{proof}
+    \nocite{troietto,vistoli}
+    \printbibliography
+\end{document}
